@@ -1,9 +1,8 @@
+import Image from "next/image"
 import { auth } from "@/auth"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+
 import { database } from "@/db/database"
-import { items } from "@/db/schema"
-import { revalidatePath } from "next/cache"
+import { ItemCard } from "@/components/item-card"
 
 export default async function HomePage() {
   const session = await auth()
@@ -21,10 +20,7 @@ export default async function HomePage() {
 
       <div className="grid grid-cols-4 gap-8">
         {allItems.map((item) => (
-          <div className="border p-8 rounded-xl" key={item.name}>
-            {item.name}
-            starting price: ${item.startingPrice / 100}
-          </div>
+          <ItemCard key={item.id} item={item} />
         ))}
       </div>
     </main>

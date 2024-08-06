@@ -1,13 +1,35 @@
-import { CreateItemAction } from "@/actions"
+"use client"
+
+import { useState } from "react"
+import { createItemAction } from "@/actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { UploadButton } from "@/lib/uploadthing"
 
-export default async function CreateBidPage() {
+export default function CreateBidPage() {
+  const [fileKey, setFileKey] = useState("")
+
   return (
     <main className="container mx-auto py-12 space-y-8">
       <h1 className="text-4xl font-bold">Post an Item</h1>
       <form
-        action={CreateItemAction}
+        onSubmit={async (e) => {
+          e.preventDefault()
+          const form = e.currentTarget as HTMLFormElement
+          const formData = new FormData(form)
+
+          const name = formData.get("name") as string
+          const startingPrice = parseInt(
+            formData.get("startingPrice") as string
+          )
+          const startingPriceInCent = Math.floor(startingPrice * 100)
+
+          await createItemAction({
+            name,
+            startingPrice: startingPriceInCent,
+            fileName: fileKey,
+          })
+        }}
         className=" flex flex-col border p-8 rounded-xl gap-4 max-w-md"
       >
         <Input required className="" name="name" placeholder="Name your item" />
@@ -19,7 +41,18 @@ export default async function CreateBidPage() {
           placeholder="What to start your action at"
           className=""
         />
-        <Button className="self-end" type="submit">
+
+        <UploadButton
+          endpoint="imageUploader"
+          onClientUploadComplete={(res) => {
+            console.log("Files: ", res)
+            setFileKey(res[0].url)
+          }}
+          onUploadError={(error: Error) => {
+            alert(`ERROR! ${error.message}`)
+          }}
+        />
+        <Button className="self-end" type="submit" disabled={!fileKey}>
           Post Item
         </Button>
       </form>
