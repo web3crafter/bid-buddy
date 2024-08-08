@@ -5,13 +5,15 @@ import { createItemAction } from "@/actions"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { UploadButton } from "@/lib/uploadthing"
+import { pageTitleStyles } from "@/styles"
+import { auth } from "@/auth"
 
 export default function CreateBidPage() {
   const [fileKey, setFileKey] = useState("")
 
   return (
-    <main className="container mx-auto py-12 space-y-8">
-      <h1 className="text-4xl font-bold">Post an Item</h1>
+    <main className="space-y-8">
+      <h1 className={pageTitleStyles}>Post an Item</h1>
       <form
         onSubmit={async (e) => {
           e.preventDefault()
