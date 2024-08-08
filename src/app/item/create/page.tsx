@@ -1,12 +1,13 @@
 "use client"
 
 import { useState } from "react"
+
+import { pageTitleStyles } from "@/styles"
 import { createItemAction } from "@/actions"
+import { UploadButton } from "@/lib/uploadthing"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { UploadButton } from "@/lib/uploadthing"
-import { pageTitleStyles } from "@/styles"
-import { auth } from "@/auth"
 
 export default function CreateBidPage() {
   const [fileKey, setFileKey] = useState("")

@@ -1,20 +1,16 @@
 import { auth } from "@/auth"
 
-import { database } from "@/db/database"
-import { ItemCard } from "@/components/item-card"
-import { items } from "@/db/schema"
-import { eq } from "drizzle-orm"
-import { EmptyState } from "@/components/empty-state"
 import { pageTitleStyles } from "@/styles"
+import { getAllItemsForUser } from "@/data-access/items"
+
+import { ItemCard } from "@/components/item-card"
+import { EmptyState } from "@/components/empty-state"
 
 export default async function AuctionsPage() {
   const session = await auth()
-  // if (!session?.user?.id) throw new Error("Unauthorized")
-  if (!session?.user?.id) return null
+  if (!session?.user?.id) throw new Error("Unauthorized")
 
-  const allItems = await database.query.items.findMany({
-    where: eq(items.userId, session?.user?.id),
-  })
+  const allItems = await getAllItemsForUser(session.user.id)
   const hasItems = allItems.length > 0
 
   return (

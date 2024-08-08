@@ -1,11 +1,11 @@
 import Image from "next/image"
 import Link from "next/link"
-import { eq } from "drizzle-orm"
 
 import { pageTitleStyles } from "@/styles"
-import { items } from "@/db/schema"
-import { database } from "@/db/database"
 import { formatToDollar, formatTimestamp } from "@/lib/utils"
+import { createBidAction } from "@/actions"
+import { getBidsForItem } from "@/data-access/bids"
+import { getItem } from "@/data-access/items"
 
 import { Button } from "@/components/ui/button"
 
@@ -14,38 +14,7 @@ export default async function ItemPage({
 }: {
   params: { itemId: string }
 }) {
-  const item = await database.query.items.findFirst({
-    where: eq(items.id, parseInt(params.itemId)),
-  })
-
-  const bids = [
-    {
-      id: 1,
-      amount: 100,
-      userName: "Lise",
-      timeStamp: new Date(),
-    },
-    {
-      id: 2,
-      amount: 200,
-      userName: "Chris",
-      timeStamp: new Date(),
-    },
-    {
-      id: 3,
-      amount: 300,
-      userName: "Zoe",
-      timeStamp: new Date(),
-    },
-    {
-      id: 4,
-      amount: 400,
-      userName: "Svein",
-      timeStamp: new Date(),
-    },
-  ]
-
-  const hasBids = bids.length > 0
+  const item = await getItem(parseInt(params.itemId))
 
   if (!item) {
     return (
@@ -62,6 +31,9 @@ export default async function ItemPage({
       </div>
     )
   }
+
+  const allBids = await getBidsForItem(parseInt(params.itemId))
+  const hasBids = allBids.length > 0
 
   return (
     <main className="space-y-8">
@@ -80,6 +52,13 @@ export default async function ItemPage({
           />
           <div className="text-xl space-y-4">
             <div>
+              Current Bid{" "}
+              <span className="font-bold">
+                {" "}
+                ${formatToDollar(item.currentBid)}
+              </span>
+            </div>
+            <div>
               Starting Price of{" "}
               <span className="font-bold">
                 {" "}
@@ -95,10 +74,15 @@ export default async function ItemPage({
           </div>
         </div>
         <div className="space-y-8 flex-1">
-          <h2 className="text-2xl font-bold">Current Bids</h2>
-          {!hasBids ? (
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold">Current Bids</h2>
+            <form action={createBidAction.bind(null, item.id)}>
+              <Button>Place a Bid</Button>
+            </form>
+          </div>
+          {hasBids ? (
             <ul className="space-y-2">
-              {bids.map((bid) => (
+              {allBids.map((bid) => (
                 <li
                   key={bid.id}
                   className="flex gap-4 bg-gray-100 rounded-xl p-8"
@@ -107,7 +91,7 @@ export default async function ItemPage({
                     <span className="font-bold">
                       ${formatToDollar(bid.amount)}
                     </span>{" "}
-                    by <span className="font-bold">{bid.userName}</span>{" "}
+                    by <span className="font-bold">{bid.user.name}</span>{" "}
                   </div>
                   <div>{formatTimestamp(bid.timeStamp)}</div>
                 </li>
@@ -117,12 +101,14 @@ export default async function ItemPage({
             <div className="flex flex-col items-center gap-8 bg-gray-100 rounded-xl p-12">
               <Image
                 src="/package.svg"
-                alt="Packeage"
+                alt="Package"
                 width={200}
                 height={200}
               />
               <h2 className="text-2xl font-bold">There are no bids yet</h2>
-              <Button>Place a Bid</Button>
+              <form action={createBidAction.bind(null, item.id)}>
+                <Button>Place a Bid</Button>
+              </form>
             </div>
           )}
         </div>

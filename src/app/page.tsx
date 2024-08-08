@@ -1,18 +1,12 @@
 import { auth } from "@/auth"
 
-import { database } from "@/db/database"
-import { ItemCard } from "@/components/item-card"
 import { pageTitleStyles } from "@/styles"
+import { getAllItems } from "@/data-access/items"
+import { ItemCard } from "@/components/item-card"
 
 export default async function HomePage() {
   const session = await auth()
-  const allItems = await database.query.items.findMany()
-
-  // if (!session) return null
-
-  // const user = session.user
-
-  // if (!user) return null
+  const allItems = await getAllItems()
 
   return (
     <main className="space-y-8">
