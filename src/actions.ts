@@ -9,6 +9,7 @@ import { Knock } from "@knocklabs/node"
 import { database } from "@/db/database"
 import { bids, items } from "@/db/schema"
 import { env } from "@/env"
+import { isBidOver } from "@/lib/utils"
 
 const knock = new Knock(env.KNOCK_SECRET_KEY)
 
@@ -16,10 +17,12 @@ export const createItemAction = async ({
   fileName,
   name,
   startingPrice,
+  endDate,
 }: {
   fileName: string
   name: string
   startingPrice: number
+  endDate: Date
 }) => {
   const session = await auth()
   if (!session) throw new Error("Unauthorized")
@@ -32,6 +35,7 @@ export const createItemAction = async ({
     startingPrice,
     fileKey: fileName,
     userId: user.id,
+    endDate,
   })
 
   redirect("/")
@@ -48,6 +52,10 @@ export const createBidAction = async (itemId: number) => {
   })
 
   if (!item) throw new Error("Item not found")
+
+  if (isBidOver(item)) {
+    throw new Error("Bid is over")
+  }
 
   const latestBidValue = item.currentBid + item.bidInterval
 

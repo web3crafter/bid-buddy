@@ -8,9 +8,11 @@ import { UploadButton } from "@/lib/uploadthing"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { DatePicker } from "@/components/date-picker"
 
 export default function CreateBidPage() {
   const [fileKey, setFileKey] = useState("")
+  const [date, setDate] = useState<Date | undefined>()
 
   return (
     <main className="space-y-8">
@@ -18,6 +20,9 @@ export default function CreateBidPage() {
       <form
         onSubmit={async (e) => {
           e.preventDefault()
+
+          if (!date) return
+
           const form = e.currentTarget as HTMLFormElement
           const formData = new FormData(form)
 
@@ -31,6 +36,7 @@ export default function CreateBidPage() {
             name,
             startingPrice: startingPriceInCent,
             fileName: fileKey,
+            endDate: date,
           })
         }}
         className=" flex flex-col border p-8 rounded-xl gap-4 max-w-md"
@@ -54,6 +60,7 @@ export default function CreateBidPage() {
             alert(`ERROR! ${error.message}`)
           }}
         />
+        <DatePicker date={date} setDate={setDate} />
         <Button className="self-end" type="submit" disabled={!fileKey}>
           Post Item
         </Button>
