@@ -8,12 +8,16 @@ import { getBidsForItem } from "@/data-access/bids"
 import { getItem } from "@/data-access/items"
 
 import { Button } from "@/components/ui/button"
+import { auth } from "@/auth"
 
 export default async function ItemPage({
   params,
 }: {
   params: { itemId: string }
 }) {
+  const session = await auth()
+  const userId = session?.user?.id
+
   const item = await getItem(parseInt(params.itemId))
 
   if (!item) {
@@ -76,9 +80,11 @@ export default async function ItemPage({
         <div className="space-y-8 flex-1">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold">Current Bids</h2>
-            <form action={createBidAction.bind(null, item.id)}>
-              <Button>Place a Bid</Button>
-            </form>
+            {userId && (
+              <form action={createBidAction.bind(null, item.id)}>
+                <Button>Place a Bid</Button>
+              </form>
+            )}
           </div>
           {hasBids ? (
             <ul className="space-y-2">
@@ -106,9 +112,11 @@ export default async function ItemPage({
                 height={200}
               />
               <h2 className="text-2xl font-bold">There are no bids yet</h2>
-              <form action={createBidAction.bind(null, item.id)}>
-                <Button>Place a Bid</Button>
-              </form>
+              {userId && (
+                <form action={createBidAction.bind(null, item.id)}>
+                  <Button type="submit">Place a Bid</Button>
+                </form>
+              )}
             </div>
           )}
         </div>

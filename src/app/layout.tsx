@@ -1,10 +1,13 @@
 import type { Metadata } from "next"
 import { Inter as FontSans } from "next/font/google"
+import "@knocklabs/react/dist/index.css"
 
 import "./globals.css"
 
 import { cn } from "@/lib/utils"
 import { Header } from "@/app/header"
+import { AppKnockProvider } from "@/app/knock-provider"
+import { SessionProvider } from "next-auth/react"
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -29,9 +32,12 @@ export default function RootLayout({
           fontSans.variable
         )}
       >
-        <Header />
-
-        <div className="container mx-auto py-12">{children}</div>
+        <SessionProvider>
+          <AppKnockProvider>
+            <Header />
+            <div className="container mx-auto py-12">{children}</div>
+          </AppKnockProvider>
+        </SessionProvider>
       </body>
     </html>
   )

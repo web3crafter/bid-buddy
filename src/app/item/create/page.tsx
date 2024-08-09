@@ -48,7 +48,6 @@ export default function CreateBidPage() {
         <UploadButton
           endpoint="imageUploader"
           onClientUploadComplete={(res) => {
-            console.log("Files: ", res)
             setFileKey(res[0].url)
           }}
           onUploadError={(error: Error) => {
